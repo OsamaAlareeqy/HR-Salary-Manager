@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Salary_Cal
+{
+    public partial class FormMainMenu : Form
+    {
+        public FormMainMenu()
+        {
+            InitializeComponent();
+        }
+
+        private void FormMainMenu_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnEmployeeInfo_Click(object sender, EventArgs e)
+        {
+            new FormEmployeeInfo().ShowDialog();
+        }
+
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void btnAttendance_Click(object sender, EventArgs e)
+        {
+            new gridAttendance().ShowDialog();
+           
+        }
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            new FormSettings().ShowDialog();
+
+        }
+
+        private void btnAdvance_Click(object sender, EventArgs e)
+        {
+            new FormAdvance().ShowDialog();
+        }
+        private void btnSalaryCalc_Click(object sender, EventArgs e)
+        {
+             new FormSalaryCalculation().ShowDialog();
+        }
+
+
+    }
+}
