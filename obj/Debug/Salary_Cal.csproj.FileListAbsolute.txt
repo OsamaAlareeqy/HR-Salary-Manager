@@ -46,4 +46,5 @@ C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\bin\Debug\System.Numerics.Vect
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormSettings.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormAdvance.resources
-C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormSalaryCalculation.resources
+C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormLogin.resources
+C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormUsers.resources

@@ -7,49 +7,79 @@ namespace Salary_Cal
 {
     public partial class FormAdvance : Form
     {
-        private TextBox txtEmployeeID;
-        private TextBox txtAmount;
-        private DateTimePicker dtDate;
-        private Button btnSave;
+
+
 
         public FormAdvance()
         {
             InitializeComponent();
         }
-
+        #region
         private void InitializeComponent()
         {
             this.txtEmployeeID = new System.Windows.Forms.TextBox();
             this.txtAmount = new System.Windows.Forms.TextBox();
             this.dtDate = new System.Windows.Forms.DateTimePicker();
             this.btnSave = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.groupBox = new System.Windows.Forms.GroupBox();
+
+            // FormAdvance
+            this.Text = "إدخال سلفة";
+            this.ClientSize = new System.Drawing.Size(400, 300);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Font = new Font("Segoe UI", 10);
+
+            // lblTitle
+            this.lblTitle.Text = "إدخال بيانات السلفة";
+            this.lblTitle.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            this.lblTitle.TextAlign = ContentAlignment.MiddleCenter;
+            this.lblTitle.Dock = DockStyle.Top;
+            this.lblTitle.Height = 40;
+
+            // groupBox
+            this.groupBox.Text = "";
+            this.groupBox.Size = new Size(340, 200);
+            this.groupBox.Location = new Point(30, 50);
 
             // txtEmployeeID
-            this.txtEmployeeID.Location = new System.Drawing.Point(50, 30);
+            this.txtEmployeeID.Size = new Size(250, 30);
+            this.txtEmployeeID.Location = new Point(40, 30);
             SetPlaceholder(txtEmployeeID, "رقم الموظف");
 
             // txtAmount
-            this.txtAmount.Location = new System.Drawing.Point(50, 70);
+            this.txtAmount.Size = new Size(250, 30);
+            this.txtAmount.Location = new Point(40, 70);
             SetPlaceholder(txtAmount, "قيمة السلفة");
 
             // dtDate
-            this.dtDate.Location = new System.Drawing.Point(50, 110);
+            this.dtDate.Size = new Size(250, 30);
+            this.dtDate.Location = new Point(40, 110);
+            this.dtDate.Format = DateTimePickerFormat.Short;
 
             // btnSave
             this.btnSave.Text = "حفظ";
-            this.btnSave.Location = new System.Drawing.Point(50, 150);
+            this.btnSave.Size = new Size(250, 35);
+            this.btnSave.Location = new Point(40, 150);
+            this.btnSave.BackColor = Color.SteelBlue;
+            this.btnSave.ForeColor = Color.White;
+            this.btnSave.FlatStyle = FlatStyle.Flat;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 
-            // FormAdvance
-            this.Controls.Add(this.txtEmployeeID);
-            this.Controls.Add(this.txtAmount);
-            this.Controls.Add(this.dtDate);
-            this.Controls.Add(this.btnSave);
-            this.Text = "إدخال سلفة";
+            // إضافة إلى النموذج
+            this.groupBox.Controls.Add(this.txtEmployeeID);
+            this.groupBox.Controls.Add(this.txtAmount);
+            this.groupBox.Controls.Add(this.dtDate);
+            this.groupBox.Controls.Add(this.btnSave);
+            this.Controls.Add(this.lblTitle);
+            this.Controls.Add(this.groupBox);
+
             this.ResumeLayout(false);
         }
 
+        #endregion
         private void SetPlaceholder(TextBox textBox, string placeholder)
         {
             textBox.Text = placeholder;
@@ -108,5 +138,12 @@ namespace Salary_Cal
                 return result != null ? result.ToString() : "اسم غير معروف";
             }
         }
+
+        private TextBox txtEmployeeID;
+        private TextBox txtAmount;
+        private DateTimePicker dtDate;
+        private Button btnSave;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.GroupBox groupBox;
     }
 }

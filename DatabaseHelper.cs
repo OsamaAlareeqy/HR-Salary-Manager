@@ -23,6 +23,33 @@ namespace Salary_Cal
             {
                 connection.Open();
 
+                string createUsersTable = @"
+                CREATE TABLE IF NOT EXISTS Users (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Username TEXT NOT NULL UNIQUE,
+                    Password TEXT NOT NULL,
+                    Role TEXT NOT NULL
+                );";
+
+                using (var command = new SQLiteCommand(createUsersTable, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                string checkAdmin = "SELECT COUNT(*) FROM Users WHERE Username = 'admin'";
+                using (var command = new SQLiteCommand(checkAdmin, connection))
+                {
+                    long count = (long)command.ExecuteScalar();
+                    if (count == 0)
+                    {
+                        string insertAdmin = "INSERT INTO Users (Username, Password, Role) VALUES ('admin', 'admin123', 'Admin')";
+                        using (var insertCmd = new SQLiteCommand(insertAdmin, connection))
+                        {
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+
                 string createEmployeeTable = @"
                 CREATE TABLE IF NOT EXISTS Employees (
                     EmployeeID INTEGER PRIMARY KEY,
@@ -172,6 +199,8 @@ namespace Salary_Cal
                 }
             }
         }
+
+
 
     }
 }

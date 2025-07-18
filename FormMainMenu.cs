@@ -12,10 +12,23 @@ namespace Salary_Cal
 {
     public partial class FormMainMenu : Form
     {
-        public FormMainMenu()
+        string currentUser;
+        string currentRole;
+
+        public FormMainMenu(string username, string role)
         {
             InitializeComponent();
+            currentUser = username;
+            currentRole = role;
+
+
+            if (currentRole != "Admin")
+            {
+                btnEmployeeInfo.Enabled = false;
+                btnSalaryCalc.Enabled = false;
+            }
         }
+
 
         private void FormMainMenu_Load(object sender, EventArgs e)
         {
@@ -50,9 +63,12 @@ namespace Salary_Cal
         }
         private void btnSalaryCalc_Click(object sender, EventArgs e)
         {
-             new FormSalaryCalculation().ShowDialog();
+            // new FormSalaryCalculation().ShowDialog();
         }
 
-
+        private void button1_Click(object sender, EventArgs e)
+        {
+            new FormUsers().ShowDialog();
+        }
     }
 }

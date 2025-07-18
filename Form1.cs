@@ -11,23 +11,9 @@ namespace Salary_Cal
     {
         List<AttendanceRecord> allRecords = new List<AttendanceRecord>();
 
-        DateTimePicker dateFrom = new DateTimePicker();
-        DateTimePicker dateTo = new DateTimePicker();
-        Button btnFilter = new Button();
-
         public gridAttendance()
         {
             InitializeComponent();
-
-            dateFrom.Location = new System.Drawing.Point(20, 20);
-            dateTo.Location = new System.Drawing.Point(250, 20);
-            btnFilter.Location = new System.Drawing.Point(480, 20);
-            btnFilter.Text = "فلترة التاريخ";
-            btnFilter.Click += btnFilter_Click;
-
-            this.Controls.Add(dateFrom);
-            this.Controls.Add(dateTo);
-            this.Controls.Add(btnFilter);
         }
 
         private void gridAttendance_Load(object sender, EventArgs e)
@@ -37,21 +23,6 @@ namespace Salary_Cal
 
         private void btnLoadFile_Click(object sender, EventArgs e)
         {
-            using (var conn = new SQLiteConnection("Data Source=employees.db"))
-            {
-                conn.Open();
-
-                foreach (var rec in allRecords)
-                {
-                    var cmd = new SQLiteCommand("INSERT INTO Attendance (EmployeeID, Timestamp, IsIn, IsOut) VALUES (@id, @ts, @in, @out)", conn);
-                    cmd.Parameters.AddWithValue("@id", rec.EmployeeId);
-                    cmd.Parameters.AddWithValue("@ts", rec.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
-                    cmd.Parameters.AddWithValue("@in", rec.IsIn);
-                    cmd.Parameters.AddWithValue("@out", rec.IsOut);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "DAT files (*.dat)|*.dat|All files (*.*)|*.*";
 
@@ -64,7 +35,7 @@ namespace Salary_Cal
                 foreach (var line in lines)
                 {
                     var parts = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length < 5) continue;
+                    if (parts.Length < 6) continue;
 
                     int employeeId = int.Parse(parts[0]);
                     string datetimeStr = parts[1] + " " + parts[2];
@@ -88,8 +59,8 @@ namespace Salary_Cal
 
         private void btnFilter_Click(object sender, EventArgs e)
         {
-            DateTime fromDate = dateFrom.Value.Date;
-            DateTime toDate = dateTo.Value.Date.AddDays(1).AddTicks(-1);
+            DateTime fromDate = dtpFrom.Value.Date;
+            DateTime toDate = dtpTo.Value.Date.AddDays(1).AddTicks(-1);
 
             var filtered = allRecords
                 .Where(r => r.Timestamp >= fromDate && r.Timestamp <= toDate)
@@ -132,6 +103,7 @@ namespace Salary_Cal
                         }
                         else
                         {
+                            // إهمال الدخول السابق وإضافة سطر فارغ
                             rows.Add(new
                             {
                                 الرقم_الوظيفي = lastIn.EmployeeId,
@@ -256,11 +228,6 @@ namespace Salary_Cal
             public bool IsOut { get; set; }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private HashSet<string> LoadOfficialHolidays()
         {
             var holidays = new HashSet<string>();
@@ -281,5 +248,3 @@ namespace Salary_Cal
         }
     }
 }
-
-

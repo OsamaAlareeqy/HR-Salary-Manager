@@ -14,7 +14,8 @@ namespace Salary_Cal
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMainMenu());
+            DatabaseHelper.InitializeDatabase();
+            Application.Run(new FormLogin());
         }
     }
 }
