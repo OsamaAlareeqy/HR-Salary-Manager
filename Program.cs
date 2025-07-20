@@ -16,6 +16,10 @@ namespace Salary_Cal
             Application.SetCompatibleTextRenderingDefault(false);
             DatabaseHelper.InitializeDatabase();
             Application.Run(new FormLogin());
+            //Application.Run( new FormAdvance());
+           // Application.Run( new FormSalaryCalculation());
+
+
         }
     }
 }

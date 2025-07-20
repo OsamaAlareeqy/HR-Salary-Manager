@@ -130,15 +130,18 @@ namespace Salary_Cal
 
         private void btnAddHoliday_Click(object sender, EventArgs e)
         {
-            string date = dateTimePicker.Value.ToString("yyyy-MM-dd");
+            DateTime date = dateTimePicker.Value; 
             string desc = txtDescription.Text.Trim();
+
             if (string.IsNullOrWhiteSpace(desc))
             {
                 MessageBox.Show("أدخل وصف العطلة");
                 return;
             }
+
             DatabaseHelper.AddHoliday(date, desc);
             LoadHolidays();
+
         }
 
         private void btnDeleteSelected_Click(object sender, EventArgs e)
@@ -163,11 +166,14 @@ namespace Salary_Cal
         private void btnLoadDefault_Click(object sender, EventArgs e)
         {
             int year = dateTimePicker.Value.Year;
-            DatabaseHelper.AddHoliday($"{year}-01-01", "رأس السنة الميلادية");
-            DatabaseHelper.AddHoliday($"{year}-05-01", "عيد العمال");
-            DatabaseHelper.AddHoliday($"{year}-05-25", "عيد الاستقلال");
-            DatabaseHelper.AddHoliday($"{year}-12-25", "عيد الميلاد المجيد");
+
+            DatabaseHelper.AddHoliday(new DateTime(year, 1, 1), "رأس السنة الميلادية");
+            DatabaseHelper.AddHoliday(new DateTime(year, 5, 1), "عيد العمال");
+            DatabaseHelper.AddHoliday(new DateTime(year, 5, 25), "عيد الاستقلال");
+            DatabaseHelper.AddHoliday(new DateTime(year, 12, 25), "عيد الميلاد المجيد");
+
             LoadHolidays();
+
         }
     }
 }

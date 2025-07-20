@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
@@ -12,8 +13,6 @@ namespace Salary_Cal
 
         public static void InitializeDatabase()
         {
-            
-
             if (!File.Exists(dbPath))
             {
                 SQLiteConnection.CreateFile(dbPath);
@@ -30,24 +29,13 @@ namespace Salary_Cal
                     Password TEXT NOT NULL,
                     Role TEXT NOT NULL
                 );";
-
-                using (var command = new SQLiteCommand(createUsersTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
+                new SQLiteCommand(createUsersTable, connection).ExecuteNonQuery();
 
                 string checkAdmin = "SELECT COUNT(*) FROM Users WHERE Username = 'admin'";
-                using (var command = new SQLiteCommand(checkAdmin, connection))
+                if ((long)new SQLiteCommand(checkAdmin, connection).ExecuteScalar() == 0)
                 {
-                    long count = (long)command.ExecuteScalar();
-                    if (count == 0)
-                    {
-                        string insertAdmin = "INSERT INTO Users (Username, Password, Role) VALUES ('admin', 'admin123', 'Admin')";
-                        using (var insertCmd = new SQLiteCommand(insertAdmin, connection))
-                        {
-                            insertCmd.ExecuteNonQuery();
-                        }
-                    }
+                    string insertAdmin = "INSERT INTO Users (Username, Password, Role) VALUES ('admin', 'admin123', 'Admin')";
+                    new SQLiteCommand(insertAdmin, connection).ExecuteNonQuery();
                 }
 
                 string createEmployeeTable = @"
@@ -56,34 +44,26 @@ namespace Salary_Cal
                     Name TEXT NOT NULL,
                     Title TEXT NOT NULL,
                     Branch TEXT NOT NULL,
+                    NationalID TEXT,
+                    HireDate TEXT,
                     Salary REAL NOT NULL
                 );";
-
-                using (var command = new SQLiteCommand(createEmployeeTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
+                new SQLiteCommand(createEmployeeTable, connection).ExecuteNonQuery();
 
                 string createBranchTable = @"
                 CREATE TABLE IF NOT EXISTS Branches (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Name TEXT NOT NULL UNIQUE
                 );";
+                new SQLiteCommand(createBranchTable, connection).ExecuteNonQuery();
 
-                using (var command = new SQLiteCommand(createBranchTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
                 string createHolidayTable = @"
                 CREATE TABLE IF NOT EXISTS Holidays (
                     Date TEXT PRIMARY KEY,
                     Description TEXT
                 );";
+                new SQLiteCommand(createHolidayTable, connection).ExecuteNonQuery();
 
-                using (var command = new SQLiteCommand(createHolidayTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
                 string createAdvancesTable = @"
                 CREATE TABLE IF NOT EXISTS Advances (
                     ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,38 +71,26 @@ namespace Salary_Cal
                     Amount REAL NOT NULL,
                     Date TEXT NOT NULL
                 );";
-
-                using (var command = new SQLiteCommand(createAdvancesTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
+                new SQLiteCommand(createAdvancesTable, connection).ExecuteNonQuery();
 
                 string createAttendanceTable = @"
                 CREATE TABLE IF NOT EXISTS Attendance (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     EmployeeID INTEGER NOT NULL,
-                    Date TEXT NOT NULL,
-                    Regular REAL DEFAULT 0,
-                    Overtime REAL DEFAULT 0,
-                    HolidayOver REAL DEFAULT 0,
+                    Timestamp TEXT NOT NULL,
+                    IsIn BOOLEAN NOT NULL,
                     FOREIGN KEY(EmployeeID) REFERENCES Employees(EmployeeID)
                 );";
-
-                using (var command = new SQLiteCommand(createAttendanceTable, connection))
-                {
-                    command.ExecuteNonQuery();
-
-                }
-
+                new SQLiteCommand(createAttendanceTable, connection).ExecuteNonQuery();
             }
         }
 
-        public static void AddEmployee(int id, string name, string title, string branch, double salary)
+        public static void AddEmployee(int id, string name, string title, string branch, double salary, string nationalId, string hireDate)
         {
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
                 connection.Open();
-                string query = "INSERT INTO Employees (EmployeeID, Name, Title, Branch, Salary) VALUES (@id, @name, @title, @branch, @salary)";
+                string query = "INSERT INTO Employees (EmployeeID, Name, Title, Branch, Salary, NationalID, HireDate) VALUES (@id, @name, @title, @branch, @salary, @nid, @hire)";
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
@@ -130,59 +98,47 @@ namespace Salary_Cal
                     cmd.Parameters.AddWithValue("@title", title);
                     cmd.Parameters.AddWithValue("@branch", branch);
                     cmd.Parameters.AddWithValue("@salary", salary);
+                    cmd.Parameters.AddWithValue("@nid", nationalId);
+                    cmd.Parameters.AddWithValue("@hire", hireDate);
                     cmd.ExecuteNonQuery();
                 }
             }
-
             MessageBox.Show("تمت إضافة الموظف بنجاح ✅");
         }
 
-        public static void AddBranch(string branchName)
+        public static double GetEmployeeAdvances(int empId, int month, int year)
         {
-            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            using (var conn = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
             {
-                connection.Open();
-                string query = "INSERT OR IGNORE INTO Branches (Name) VALUES (@name)";
-                using (var cmd = new SQLiteCommand(query, connection))
+                conn.Open();
+                string q = "SELECT SUM(Amount) FROM Advances WHERE EmployeeID = @id AND strftime('%m', Date) = @month AND strftime('%Y', Date) = @year";
+                using (var cmd = new SQLiteCommand(q, conn))
                 {
-                    cmd.Parameters.AddWithValue("@name", branchName);
-                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue("@id", empId);
+                    cmd.Parameters.AddWithValue("@month", month.ToString("D2"));
+                    cmd.Parameters.AddWithValue("@year", year.ToString());
+                    var result = cmd.ExecuteScalar();
+                    return result != DBNull.Value ? Convert.ToDouble(result) : 0;
                 }
             }
+        }
+        public static double GetEmployeeTotalAdvances(int employeeId)
+        {
+            double total = 0;
+
+            using (var conn = new SQLiteConnection("Data Source=employees.db"))
+            {
+                conn.Open();
+                var cmd = new SQLiteCommand("SELECT IFNULL(SUM(Amount), 0) FROM Advances WHERE EmployeeID = @empId", conn);
+                cmd.Parameters.AddWithValue("@empId", employeeId);
+
+                object result = cmd.ExecuteScalar();
+                total = Convert.ToDouble(result);
+            }
+
+            return total;
         }
 
-        public static List<string> GetAllBranches()
-        {
-            List<string> branches = new List<string>();
-            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
-            {
-                connection.Open();
-                string query = "SELECT Name FROM Branches";
-                using (var cmd = new SQLiteCommand(query, connection))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        branches.Add(reader["Name"].ToString());
-                    }
-                }
-            }
-            return branches;
-        }
-        public static void AddHoliday(string date, string description)
-        {
-            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
-            {
-                connection.Open();
-                string query = "INSERT OR IGNORE INTO Holidays (Date, Description) VALUES (@date, @desc)";
-                using (var cmd = new SQLiteCommand(query, connection))
-                {
-                    cmd.Parameters.AddWithValue("@date", date);
-                    cmd.Parameters.AddWithValue("@desc", description);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
         public static bool IsHoliday(DateTime date)
         {
             using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
@@ -200,7 +156,52 @@ namespace Salary_Cal
             }
         }
 
+        public static void AddBranch(string branchName)
+        {
+            using (var conn = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                conn.Open();
+                string query = "INSERT OR IGNORE INTO Branches (Name) VALUES (@name)";
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@name", branchName);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
+        public static List<string> GetAllBranches()
+        {
+            List<string> branches = new List<string>();
+            using (var conn = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                conn.Open();
+                string query = "SELECT Name FROM Branches";
+                using (var cmd = new SQLiteCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        branches.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return branches;
+        }
 
+        public static void AddHoliday(DateTime date, string description)
+        {
+            using (var conn = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                conn.Open();
+                string query = "INSERT OR IGNORE INTO Holidays (Date, Description) VALUES (@date, @desc)";
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@date", date.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@desc", description);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

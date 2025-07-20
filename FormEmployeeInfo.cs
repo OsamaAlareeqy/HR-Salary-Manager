@@ -58,14 +58,8 @@ namespace Salary_Cal
                 branches = new List<string> {
                    "الياسمين 3",
                    "الياسمين 1",
-                   "الاذاعة",
-                   "الحويان",
-                   "السلط",
-                   "عبد الله غوشة",
-                   "الصويفية",
-                   "الزرقاء",
-                   "المدينة 1",
-                   "المدينة 2"
+                   "الاذاعة"
+
                 };
 
                 foreach (var branch in branches)
@@ -95,13 +89,18 @@ namespace Salary_Cal
                 string title = txtTitle.Text.Trim();
                 string branch = cmbBranch.SelectedItem?.ToString();
                 double salary = double.Parse(txtSalary.Text.Trim());
+                string nationalId = txtNationalID.Text.Trim();
+                string hireDate = dtpHireDate.Value.ToString("yyyy-MM-dd");
 
-                DatabaseHelper.AddEmployee(id, name, title, branch, salary);
+
+                DatabaseHelper.AddEmployee( id,  name,  title,  branch,  salary,  nationalId,  hireDate);
 
                 txtID.Clear();
                 txtName.Clear();
                 txtTitle.Clear();
                 txtSalary.Clear();
+                txtNationalID.Clear();
+                
                 cmbBranch.SelectedIndex = 0;
 
                 LoadEmployees();
@@ -184,6 +183,7 @@ namespace Salary_Cal
                 txtTitle.Text = row.Cells["Title"].Value.ToString();
                 cmbBranch.SelectedItem = row.Cells["Branch"].Value.ToString();
                 txtSalary.Text = row.Cells["Salary"].Value.ToString();
+                
             }
         }
 

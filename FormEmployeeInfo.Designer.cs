@@ -13,6 +13,7 @@ namespace Salary_Cal
         private System.Windows.Forms.ComboBox cmbBranch;
         private System.Windows.Forms.Button btnAddBranch;
 
+
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
@@ -36,6 +37,7 @@ namespace Salary_Cal
             this.btnAddEmployee = new System.Windows.Forms.Button();
             this.cmbBranch = new System.Windows.Forms.ComboBox();
             this.btnAddBranch = new System.Windows.Forms.Button();
+            this.dtpHireDate = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -49,6 +51,10 @@ namespace Salary_Cal
             this.btnExportPdf = new System.Windows.Forms.Button();
             this.lblTitle = new System.Windows.Forms.Label();
             this.btnUpdateEmployee = new System.Windows.Forms.Button();
+            this.txtNationalID = new System.Windows.Forms.TextBox();
+            this.lblNatrionalID = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.dtpDateHire = new System.Windows.Forms.DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridEmployees)).BeginInit();
             this.SuspendLayout();
             // 
@@ -82,7 +88,7 @@ namespace Salary_Cal
             // 
             // btnAddEmployee
             // 
-            this.btnAddEmployee.Location = new System.Drawing.Point(30, 310);
+            this.btnAddEmployee.Location = new System.Drawing.Point(30, 398);
             this.btnAddEmployee.Name = "btnAddEmployee";
             this.btnAddEmployee.Size = new System.Drawing.Size(200, 30);
             this.btnAddEmployee.TabIndex = 6;
@@ -105,6 +111,13 @@ namespace Salary_Cal
             this.btnAddBranch.TabIndex = 4;
             this.btnAddBranch.Text = "+";
             this.btnAddBranch.Click += new System.EventHandler(this.btnAddBranch_Click);
+            // 
+            // dtpHireDate
+            // 
+            this.dtpHireDate.Location = new System.Drawing.Point(30, 310);
+            this.dtpHireDate.Name = "dtpHireDate";
+            this.dtpHireDate.Size = new System.Drawing.Size(100, 22);
+            this.dtpHireDate.TabIndex = 13;
             // 
             // label1
             // 
@@ -214,7 +227,7 @@ namespace Salary_Cal
             // 
             // btnUpdateEmployee
             // 
-            this.btnUpdateEmployee.Location = new System.Drawing.Point(33, 346);
+            this.btnUpdateEmployee.Location = new System.Drawing.Point(33, 446);
             this.btnUpdateEmployee.Name = "btnUpdateEmployee";
             this.btnUpdateEmployee.Size = new System.Drawing.Size(197, 30);
             this.btnUpdateEmployee.TabIndex = 20;
@@ -222,9 +235,45 @@ namespace Salary_Cal
             this.btnUpdateEmployee.UseVisualStyleBackColor = true;
             this.btnUpdateEmployee.Click += new System.EventHandler(this.btnUpdateEmployee_Click);
             // 
+            // txtNationalID
+            // 
+            this.txtNationalID.Location = new System.Drawing.Point(30, 310);
+            this.txtNationalID.Name = "txtNationalID";
+            this.txtNationalID.Size = new System.Drawing.Size(197, 22);
+            this.txtNationalID.TabIndex = 21;
+            // 
+            // lblNatrionalID
+            // 
+            this.lblNatrionalID.AutoSize = true;
+            this.lblNatrionalID.Location = new System.Drawing.Point(30, 290);
+            this.lblNatrionalID.Name = "lblNatrionalID";
+            this.lblNatrionalID.Size = new System.Drawing.Size(66, 16);
+            this.lblNatrionalID.TabIndex = 22;
+            this.lblNatrionalID.Text = "الرقم الوطني";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(30, 340);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(69, 16);
+            this.label6.TabIndex = 23;
+            this.label6.Text = "تاريخ التعيين";
+            // 
+            // dtpDateHire
+            // 
+            this.dtpDateHire.Location = new System.Drawing.Point(30, 360);
+            this.dtpDateHire.Name = "dtpDateHire";
+            this.dtpDateHire.Size = new System.Drawing.Size(200, 22);
+            this.dtpDateHire.TabIndex = 24;
+            // 
             // FormEmployeeInfo
             // 
             this.ClientSize = new System.Drawing.Size(935, 671);
+            this.Controls.Add(this.dtpDateHire);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.lblNatrionalID);
+            this.Controls.Add(this.txtNationalID);
             this.Controls.Add(this.btnUpdateEmployee);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.btnExportPdf);
@@ -263,5 +312,10 @@ namespace Salary_Cal
         private System.Windows.Forms.Button btnExportPdf;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Button btnUpdateEmployee;
+        private System.Windows.Forms.DateTimePicker dtpHireDate;
+        private System.Windows.Forms.TextBox txtNationalID;
+        private System.Windows.Forms.Label lblNatrionalID;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.DateTimePicker dtpDateHire;
     }
 }

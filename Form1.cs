@@ -227,7 +227,7 @@ namespace Salary_Cal
             public bool IsIn { get; set; }
             public bool IsOut { get; set; }
         }
-
+        
         private HashSet<string> LoadOfficialHolidays()
         {
             var holidays = new HashSet<string>();
