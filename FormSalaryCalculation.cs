@@ -124,39 +124,44 @@ namespace Salary_Cal
                     g.DrawString($"قسائم رواتب الموظفين عن شهر {DateTime.Now:MM} لعام {DateTime.Now:yyyy}", font14, Brushes.Black, 350, y += 50);
 
                     // بيانات الموظف
-                    g.DrawString($"الاسم: {emp.Name}    الرقم الوظيفي: {empId}", font14, Brushes.Black, 50, y += 60);
-                    g.DrawString($"المسمى الوظيفي: {empDetails.Title}", font14, Brushes.Black, 50, y += 40);
-                    g.DrawString($"الراتب الأساسي: {salary:0.##}    الرقم الوطني: {empDetails.NationalID}    تاريخ التعيين: {empDetails.HireDate}", font14, Brushes.Black, 50, y += 40);
+                    g.DrawString($" {emp.Name} : الاسم  \t\t\t\t\t\t\t\t\t\t\t      الرقم الوظيفي : {empId}", font14, Brushes.Black, 50, y += 60);
+                    g.DrawString($" {empDetails.Title} : المسمى الوظيفي", font14, Brushes.Black, 50, y += 40);
+                    g.DrawString($"الراتب الأساسي: {salary:0.##} \t\t\t الرقم الوطني: {empDetails.NationalID} \t\t\t   تاريخ التعيين: {empDetails.HireDate}", font14, Brushes.Black, 50, y += 40);
 
-                    // جداول العلاوات والاقتطاعات
-                    g.DrawString("علاوات الموظف", font16b, Brushes.Black, 100, y += 60);
-                    g.DrawString("النوع", font14, Brushes.Black, 100, y += 30);
-                    g.DrawString("القيمة", font14, Brushes.Black, 300, y);
-                    g.DrawString("عمل إضافي", font14, Brushes.Black, 100, y += 30);
-                    g.DrawString((dailyAttendance.Sum(d => d.Hours > 9 ? d.Hours - 9 : 0) * (salary / (22 * 9)) * 1.25).ToString("0.##"), font14, Brushes.Black, 300, y);
-                    g.DrawString("بدل عطل رسمية", font14, Brushes.Black, 100, y += 30);
-                    g.DrawString("...", font14, Brushes.Black, 300, y); // قيمة البدل
 
                     y += 60;
-                    g.DrawString("اقتطاعات الموظف", font16b, Brushes.Black, 700, y - 90);
-                    g.DrawString("النوع", font14, Brushes.Black, 700, y - 60);
-                    g.DrawString("القيمة", font14, Brushes.Black, 900, y - 60);
-                    g.DrawString("الخصومات", font14, Brushes.Black, 700, y - 30);
-                    g.DrawString("0", font14, Brushes.Black, 900, y - 30);  // خصومات إضافية
-                    g.DrawString("مجموع السلف", font14, Brushes.Black, 700, y);
-                    g.DrawString(DatabaseHelper.GetEmployeeTotalAdvances(empId).ToString("0.##"), font14, Brushes.Black, 900, y);
+                    // جداول العلاوات والاقتطاعات
+                    g.DrawString("علاوات الموظف", font16b, Brushes.Black, 100, y += 80);
+                    y += 20;
+                    g.DrawString("النوع", font14, Brushes.Black, 300, y += 30);
+                    g.DrawString("القيمة", font14, Brushes.Black, 100, y);
+                    g.DrawString("عمل إضافي", font14, Brushes.Black, 300, y += 30);
+                    g.DrawString((dailyAttendance.Sum(d => d.Hours > 9 ? d.Hours - 9 : 0) * (salary / (22 * 9)) * 1.25).ToString("0.##"), font14, Brushes.Black, 100, y);
+                    g.DrawString("بدل عطل رسمية", font14, Brushes.Black, 300, y += 30);
+                    g.DrawString("...", font14, Brushes.Black, 100, y); // قيمة البدل
+
+
+                    g.DrawString("اقتطاعات الموظف", font16b, Brushes.Black, 900, y - 90);
+                    y += 20;
+                    g.DrawString("النوع", font14, Brushes.Black, 900, y - 60);
+                    g.DrawString("القيمة", font14, Brushes.Black, 700, y - 60);
+                    g.DrawString("الخصومات", font14, Brushes.Black, 900, y - 30);
+                    g.DrawString("0", font14, Brushes.Black, 700, y - 30);  // خصومات إضافية
+                    g.DrawString("مجموع السلف", font14, Brushes.Black, 900, y);
+                    g.DrawString(DatabaseHelper.GetEmployeeTotalAdvances(empId).ToString("0.##"), font14, Brushes.Black, 700, y);
 
                     // الراتب الصافي
-                    y += 60;
-                    g.DrawString($"صافي الراتب: {totalSalary:0.##} دينار", font16b, Brushes.Black, 50, y);
+                    y += 100;
+                    g.DrawString($"\t\t\t\t\tصافي الراتب: {totalSalary:0.##} دينار", font16b, Brushes.Black, 50, y);
 
                     // جدول الحضور
                     y += 80;
                     DrawAttendanceTable(g, dailyAttendance, font14, font16b, ref y);
 
                     // التوقيع
-                    g.DrawString($"أنا الموقع أدناه {emp.Name} أقر بأن التفاصيل صحيحة...", font14, Brushes.Black, 50, y += 40);
-                    g.DrawString($"التاريخ: {DateTime.Now:yyyy-MM-dd}                التوقيع: ___________", font14, Brushes.Black, 50, y += 40);
+                    g.DrawString($"\t\t\t أنا الموقع أدناه أقر بأن التفاصيل الذكورة اعلاه صحيحة واني استلمت المبلغ الذكور كاملاً   ", font14, Brushes.Black, 50, y += 40);
+                    y += 50;
+                    g.DrawString($"\t\t\t\t\t  ___________ :  التاريخ: {DateTime.Now:yyyy-MM-dd}             التوقيع                   ", font14, Brushes.Black, 50, y += 40);
                 }
 
                 using (MemoryStream ms = new MemoryStream())
