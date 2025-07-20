@@ -63,7 +63,7 @@ namespace Salary_Cal
         }
         private void btnSalaryCalc_Click(object sender, EventArgs e)
         {
-            // new FormSalaryCalculation().ShowDialog();
+            new FormSalaryCalculation().ShowDialog();
         }
 
         private void button1_Click(object sender, EventArgs e)
