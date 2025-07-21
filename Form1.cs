@@ -5,6 +5,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Salary_Cal;
+
 
 namespace Salary_Cal
 {
@@ -36,37 +38,44 @@ namespace Salary_Cal
                 {
                     string[] lines = File.ReadAllLines(filePath);
 
+
                     foreach (var line in lines)
                     {
                         var parts = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
                         if (parts.Length < 6) continue;
 
-                        if (!int.TryParse(parts[0], out int employeeId))
-                            continue;
-
-                        string datetimeStr = parts[1] + " " + parts[2];
-                        if (!DateTime.TryParseExact(datetimeStr, "yyyy-MM-dd HH:mm:ss", null, DateTimeStyles.None, out DateTime timestamp))
-                            continue;
-
-                        bool isIn = parts[4] == "0";
-                        bool isOut = parts[5] == "1";
-
-                        allRecords.Add(new AttendanceRecord
+                        AttendanceRecord record = new AttendanceRecord
                         {
-                            EmployeeId = employeeId,
-                            Timestamp = timestamp,
-                            IsIn = isIn,
-                            IsOut = isOut
-                        });
+                            EmployeeID = int.Parse(parts[0]),
+                            Name = parts[1],
+                            Date = DateTime.Parse(parts[2]),
+                            InTime = parts[3] == "True",
+                            OutTime = parts[4] == "True",
+                            RegularTime = double.Parse(parts[5]),
+                            OverTime = double.Parse(parts[6])
+                        };
+
+                        allRecords.Add(record);
+
+                        DatabaseHelper.SaveAttendanceRecord(record);
                     }
+
                 }
 
                 allRecords = allRecords
-                    .GroupBy(r => new { r.EmployeeId, r.Timestamp, r.IsIn, r.IsOut })
+                    .GroupBy(r => new { r.EmployeeID, r.Date, r.InTime, r.OutTime })
                     .Select(g => g.First()).ToList();
 
                 MessageBox.Show($"تم تحميل {allRecords.Count} سجل من {openFileDialog.FileNames.Length} ملف.");
                 DisplayRecords(allRecords);
+                int selectedEmployeeID = 21003; 
+                DateTime selectedMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+                EmployeeWorkSummary summary = GenerateSummaryForEmployee(selectedEmployeeID, selectedMonth, allRecords);
+                FormSalaryCalculation formSalary = new FormSalaryCalculation(summary);
+                formSalary.LoadAttendanceRecords(allRecords);
+                formSalary.Show();
+
             }
         }
 
@@ -76,7 +85,7 @@ namespace Salary_Cal
             DateTime toDate = dtpTo.Value.Date.AddDays(1).AddTicks(-1);
 
             var filtered = allRecords
-                .Where(r => r.Timestamp >= fromDate && r.Timestamp <= toDate)
+                .Where(r => r.Date >= fromDate && r.Date <= toDate)
                 .ToList();
 
             if (filtered.Count == 0)
@@ -94,12 +103,12 @@ namespace Salary_Cal
             var holidays = LoadOfficialHolidays();
 
             var grouped = recordsToShow
-                .OrderBy(r => r.Timestamp)
-                .GroupBy(r => new { r.EmployeeId, Date = r.Timestamp.Date });
+                .OrderBy(r => r.Date)
+                .GroupBy(r => new { r.EmployeeID, Date = r.Date.Date });
 
             foreach (var group in grouped)
             {
-                var records = group.OrderBy(r => r.Timestamp).ToList();
+                var records = group.OrderBy(r => r.Date).ToList();
                 AttendanceRecord lastIn = null;
 
                 double totalRegular = 0;
@@ -108,7 +117,7 @@ namespace Salary_Cal
 
                 foreach (var rec in records)
                 {
-                    if (rec.IsIn)
+                    if (rec.InTime)
                     {
                         if (lastIn == null)
                         {
@@ -118,10 +127,10 @@ namespace Salary_Cal
                         {
                             rows.Add(new
                             {
-                                الرقم_الوظيفي = lastIn.EmployeeId,
-                                التاريخ = lastIn.Timestamp.ToString("yyyy-MM-dd"),
-                                اليوم = lastIn.Timestamp.ToString("dddd", new CultureInfo("ar-JO")),
-                                وقت_الدخول = lastIn.Timestamp.ToString("HH:mm:ss"),
+                                الرقم_الوظيفي = lastIn.EmployeeID,
+                                التاريخ = lastIn.Date.ToString("yyyy-MM-dd"),
+                                اليوم = lastIn.Date.ToString("dddd", new CultureInfo("ar-JO")),
+                                وقت_الدخول = lastIn.Date.ToString("HH:mm:ss"),
                                 وقت_الخروج = "",
                                 مدة_العمل_بالساعة = "",
                                 ساعات_اساسية = "",
@@ -133,9 +142,9 @@ namespace Salary_Cal
                     }
                     else if (lastIn != null)
                     {
-                        TimeSpan duration = rec.Timestamp - lastIn.Timestamp;
+                        TimeSpan duration = rec.Date - lastIn.Date;
                         double totalHours = duration.TotalHours;
-                        string dayKey = lastIn.Timestamp.ToString("yyyy-MM-dd");
+                        string dayKey = lastIn.Date.ToString("yyyy-MM-dd");
                         bool isHoliday = holidays.Contains(dayKey);
 
                         double regularHours = 0;
@@ -158,11 +167,11 @@ namespace Salary_Cal
 
                         rows.Add(new
                         {
-                            الرقم_الوظيفي = lastIn.EmployeeId,
-                            التاريخ = lastIn.Timestamp.ToString("yyyy-MM-dd"),
-                            اليوم = lastIn.Timestamp.ToString("dddd", new CultureInfo("ar-JO")),
-                            وقت_الدخول = lastIn.Timestamp.ToString("HH:mm:ss"),
-                            وقت_الخروج = rec.Timestamp.ToString("HH:mm:ss"),
+                            الرقم_الوظيفي = lastIn.EmployeeID,
+                            التاريخ = lastIn.Date.ToString("yyyy-MM-dd"),
+                            اليوم = lastIn.Date.ToString("dddd", new CultureInfo("ar-JO")),
+                            وقت_الدخول = lastIn.Date.ToString("HH:mm:ss"),
+                            وقت_الخروج = rec.Date.ToString("HH:mm:ss"),
                             مدة_العمل_بالساعة = duration.ToString(@"hh\:mm\:ss"),
                             ساعات_اساسية = regularHours.ToString("0.##"),
                             ساعات_اضافية = overtimeHours.ToString("0.##"),
@@ -175,11 +184,11 @@ namespace Salary_Cal
                     {
                         rows.Add(new
                         {
-                            الرقم_الوظيفي = rec.EmployeeId,
-                            التاريخ = rec.Timestamp.ToString("yyyy-MM-dd"),
-                            اليوم = rec.Timestamp.ToString("dddd", new CultureInfo("ar-JO")),
+                            الرقم_الوظيفي = rec.EmployeeID,
+                            التاريخ = rec.Date.ToString("yyyy-MM-dd"),
+                            اليوم = rec.Date.ToString("dddd", new CultureInfo("ar-JO")),
                             وقت_الدخول = "",
-                            وقت_الخروج = rec.Timestamp.ToString("HH:mm:ss"),
+                            وقت_الخروج = rec.Date.ToString("HH:mm:ss"),
                             مدة_العمل_بالساعة = "",
                             ساعات_اساسية = "",
                             ساعات_اضافية = "",
@@ -192,10 +201,10 @@ namespace Salary_Cal
                 {
                     rows.Add(new
                     {
-                        الرقم_الوظيفي = lastIn.EmployeeId,
-                        التاريخ = lastIn.Timestamp.ToString("yyyy-MM-dd"),
-                        اليوم = lastIn.Timestamp.ToString("dddd", new CultureInfo("ar-JO")),
-                        وقت_الدخول = lastIn.Timestamp.ToString("HH:mm:ss"),
+                        الرقم_الوظيفي = lastIn.EmployeeID,
+                        التاريخ = lastIn.Date   .ToString("yyyy-MM-dd"),
+                        اليوم = lastIn.Date.ToString("dddd", new CultureInfo("ar-JO")),
+                        وقت_الدخول = lastIn.Date.ToString("HH:mm:ss"),
                         وقت_الخروج = "",
                         مدة_العمل_بالساعة = "",
                         ساعات_اساسية = "",
@@ -206,7 +215,7 @@ namespace Salary_Cal
 
                 rows.Add(new
                 {
-                    الرقم_الوظيفي = group.Key.EmployeeId,
+                    الرقم_الوظيفي = group.Key.EmployeeID,
                     التاريخ = "مجموع",
                     اليوم = "",
                     وقت_الدخول = "",
@@ -237,33 +246,21 @@ namespace Salary_Cal
             }
         }
 
-        public class AttendanceRecord
-        {
-            public int EmployeeId { get; set; }
-            public DateTime Timestamp { get; set; }
-            public bool IsIn { get; set; }
-            public bool IsOut { get; set; }
 
-            
-            public bool IsHoliday { get; set; } 
-            public DateTime Date => Timestamp.Date; 
-            public double RegularTime { get; set; } 
-            public double OverTime { get; set; } 
-        }
 
 
         public class EmployeeWorkSummary
         {
-            public int EmployeeId { get; set; }
+            public int EmployeeID { get; set; }
             public double TotalRegularHours { get; set; }
             public double TotalOvertimeHours { get; set; }
             public double TotalHolidayOvertimeHours { get; set; }
         }
-        public static EmployeeWorkSummary GenerateSummaryForEmployee(int employeeId, DateTime selectedMonth, List<AttendanceRecord> attendanceRecords)
+        public static EmployeeWorkSummary GenerateSummaryForEmployee(int EmployeeID, DateTime selectedMonth, List<AttendanceRecord> attendanceRecords)
         {
             var summary = new EmployeeWorkSummary
             {
-                EmployeeId = employeeId,
+                EmployeeID = EmployeeID,
                 TotalRegularHours = 0,
                 TotalOvertimeHours = 0,
                 TotalHolidayOvertimeHours = 0
@@ -271,13 +268,16 @@ namespace Salary_Cal
 
             foreach (var record in attendanceRecords)
             {
-                if (record.EmployeeId != employeeId)
+
+                if (record.EmployeeID != EmployeeID)
                     continue;
 
                 if (record.Date.Month != selectedMonth.Month || record.Date.Year != selectedMonth.Year)
                     continue;
 
-                if (record.IsHoliday)
+                var holidays = LoadOfficialHolidays();
+
+                if (holidays.Contains(record.Date.ToString("yyyy-MM-dd")))
                 {
                     summary.TotalHolidayOvertimeHours += record.OverTime;
                 }
@@ -286,6 +286,7 @@ namespace Salary_Cal
                     summary.TotalRegularHours += record.RegularTime;
                     summary.TotalOvertimeHours += record.OverTime;
                 }
+
             }
 
             return summary;
@@ -298,43 +299,43 @@ namespace Salary_Cal
             var holidays = LoadOfficialHolidays();
 
             var grouped = allRecords
-                .GroupBy(r => new { r.EmployeeId, Date = r.Timestamp.Date });
+                .GroupBy(r => new { r.EmployeeID, Date = r.Date.Date });
 
             var summaryMap = new Dictionary<int, EmployeeWorkSummary>();
 
             foreach (var group in grouped)
             {
-                var records = group.OrderBy(r => r.Timestamp).ToList();
+                var records = group.OrderBy(r => r.Date).ToList();
                 AttendanceRecord lastIn = null;
 
                 foreach (var rec in records)
                 {
-                    if (rec.IsIn)
+                    if (rec.InTime)
                     {
                         lastIn = rec;
                     }
                     else if (lastIn != null)
                     {
-                        TimeSpan duration = rec.Timestamp - lastIn.Timestamp;
+                        TimeSpan duration = rec.Date - lastIn.Date;
                         double hours = duration.TotalHours;
-                        bool isHoliday = holidays.Contains(lastIn.Timestamp.ToString("yyyy-MM-dd"));
+                        bool isHoliday = holidays.Contains(lastIn.Date.ToString("yyyy-MM-dd"));
 
-                        if (!summaryMap.ContainsKey(group.Key.EmployeeId))
+                        if (!summaryMap.ContainsKey(group.Key.EmployeeID))
                         {
-                            summaryMap[group.Key.EmployeeId] = new EmployeeWorkSummary
+                            summaryMap[group.Key.EmployeeID] = new EmployeeWorkSummary
                             {
-                                EmployeeId = group.Key.EmployeeId
+                                EmployeeID = group.Key.EmployeeID
                             };
                         }
 
                         if (isHoliday)
                         {
-                            summaryMap[group.Key.EmployeeId].TotalHolidayOvertimeHours += hours;
+                            summaryMap[group.Key.EmployeeID].TotalHolidayOvertimeHours += hours;
                         }
                         else
                         {
-                            summaryMap[group.Key.EmployeeId].TotalRegularHours += Math.Min(hours, 9);
-                            summaryMap[group.Key.EmployeeId].TotalOvertimeHours += Math.Max(0, hours - 9);
+                            summaryMap[group.Key.EmployeeID].TotalRegularHours += Math.Min(hours, 9);
+                            summaryMap[group.Key.EmployeeID].TotalOvertimeHours += Math.Max(0, hours - 9);
                         }
 
                         lastIn = null;
@@ -346,7 +347,7 @@ namespace Salary_Cal
             return summaries;
         }
 
-        private HashSet<string> LoadOfficialHolidays()
+        private static HashSet<string> LoadOfficialHolidays()
         {
             var holidays = new HashSet<string>();
             using (var conn = new SQLiteConnection("Data Source=employees.db;Version=3;"))

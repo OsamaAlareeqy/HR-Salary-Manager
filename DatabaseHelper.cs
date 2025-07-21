@@ -1,4 +1,5 @@
 ﻿
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -75,12 +76,17 @@ namespace Salary_Cal
 
                 string createAttendanceTable = @"
                 CREATE TABLE IF NOT EXISTS Attendance (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    EmployeeID INTEGER NOT NULL,
-                    Timestamp TEXT NOT NULL,
-                    IsIn BOOLEAN NOT NULL,
-                    FOREIGN KEY(EmployeeID) REFERENCES Employees(EmployeeID)
-                );";
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    EmployeeID INTEGER,
+                    Name TEXT,
+                    Date TEXT,
+                    InTime INTEGER,
+                    OutTime INTEGER,
+                    RegularTime REAL,
+                    OverTime REAL
+                );
+            ";
+
                 new SQLiteCommand(createAttendanceTable, connection).ExecuteNonQuery();
             }
         }
@@ -203,5 +209,28 @@ namespace Salary_Cal
                 }
             }
         }
+        public static void SaveAttendanceRecord(AttendanceRecord record)
+        {
+            using (var conn = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            {
+                conn.Open();
+                string query = @"INSERT INTO Attendance 
+                        (EmployeeID, Name, Date, InTime, OutTime, RegularTime, OverTime) 
+                        VALUES (@EmployeeID, @Name, @Date, @InTime, @OutTime, @RegularTime, @OverTime)";
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@EmployeeID", record.EmployeeID);
+                    cmd.Parameters.AddWithValue("@Name", record.Name);
+                    cmd.Parameters.AddWithValue("@Date", record.Date.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@InTime", record.InTime);
+                    cmd.Parameters.AddWithValue("@OutTime", record.OutTime);
+                    cmd.Parameters.AddWithValue("@RegularTime", record.RegularTime);
+                    cmd.Parameters.AddWithValue("@OverTime", record.OverTime);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
     }
 }

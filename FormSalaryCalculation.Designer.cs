@@ -34,6 +34,11 @@ namespace Salary_Cal
             this.txtHolidayHours = new System.Windows.Forms.TextBox();
             this.txtMonthlySalary = new System.Windows.Forms.TextBox();
             this.txtCalculatedSalary = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,7 +79,7 @@ namespace Salary_Cal
             // btnExportPDF
             // 
             this.btnExportPDF.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.btnExportPDF.Location = new System.Drawing.Point(207, 260);
+            this.btnExportPDF.Location = new System.Drawing.Point(12, 406);
             this.btnExportPDF.Name = "btnExportPDF";
             this.btnExportPDF.Size = new System.Drawing.Size(140, 32);
             this.btnExportPDF.TabIndex = 1;
@@ -130,7 +135,7 @@ namespace Salary_Cal
             // 
             // txtRegularHours
             // 
-            this.txtRegularHours.Location = new System.Drawing.Point(436, 226);
+            this.txtRegularHours.Location = new System.Drawing.Point(239, 226);
             this.txtRegularHours.Name = "txtRegularHours";
             this.txtRegularHours.ReadOnly = true;
             this.txtRegularHours.Size = new System.Drawing.Size(120, 30);
@@ -138,7 +143,7 @@ namespace Salary_Cal
             // 
             // txtOvertimeHours
             // 
-            this.txtOvertimeHours.Location = new System.Drawing.Point(436, 262);
+            this.txtOvertimeHours.Location = new System.Drawing.Point(239, 262);
             this.txtOvertimeHours.Name = "txtOvertimeHours";
             this.txtOvertimeHours.ReadOnly = true;
             this.txtOvertimeHours.Size = new System.Drawing.Size(120, 30);
@@ -146,7 +151,7 @@ namespace Salary_Cal
             // 
             // txtHolidayHours
             // 
-            this.txtHolidayHours.Location = new System.Drawing.Point(436, 302);
+            this.txtHolidayHours.Location = new System.Drawing.Point(239, 302);
             this.txtHolidayHours.Name = "txtHolidayHours";
             this.txtHolidayHours.ReadOnly = true;
             this.txtHolidayHours.Size = new System.Drawing.Size(120, 30);
@@ -154,22 +159,72 @@ namespace Salary_Cal
             // 
             // txtMonthlySalary
             // 
-            this.txtMonthlySalary.Location = new System.Drawing.Point(436, 342);
+            this.txtMonthlySalary.Location = new System.Drawing.Point(239, 342);
             this.txtMonthlySalary.Name = "txtMonthlySalary";
             this.txtMonthlySalary.Size = new System.Drawing.Size(120, 30);
             this.txtMonthlySalary.TabIndex = 10;
             // 
             // txtCalculatedSalary
             // 
-            this.txtCalculatedSalary.Location = new System.Drawing.Point(436, 382);
+            this.txtCalculatedSalary.Location = new System.Drawing.Point(239, 382);
             this.txtCalculatedSalary.Name = "txtCalculatedSalary";
             this.txtCalculatedSalary.ReadOnly = true;
             this.txtCalculatedSalary.Size = new System.Drawing.Size(120, 30);
             this.txtCalculatedSalary.TabIndex = 11;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(418, 229);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(170, 23);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "ساعات العمل الأساسية";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(418, 265);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(167, 23);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "ساعات العمل الإضافي";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(398, 305);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(190, 23);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "العمل ايام العطل الرسمية";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(472, 342);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(113, 23);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "الراتب الاساسي";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(484, 385);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(101, 23);
+            this.label5.TabIndex = 16;
+            this.label5.Text = "حساب الراتب";
+            // 
             // FormSalaryCalculation
             // 
             this.ClientSize = new System.Drawing.Size(600, 450);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox);
             this.Controls.Add(this.btnExportPDF);
             this.Controls.Add(this.txtRegularHours);
@@ -207,5 +262,10 @@ namespace Salary_Cal
         private System.Windows.Forms.TextBox txtHolidayHours;
         private System.Windows.Forms.TextBox txtMonthlySalary;
         private System.Windows.Forms.TextBox txtCalculatedSalary;
+        private Label label1;
+        private Label label2;
+        private Label label3;
+        private Label label4;
+        private Label label5;
     }
 }

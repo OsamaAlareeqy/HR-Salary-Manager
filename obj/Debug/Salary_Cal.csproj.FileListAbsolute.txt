@@ -1,13 +1,11 @@
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.csproj.AssemblyReference.cache
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.EditEmployeeForm.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.gridAttendance.resources
-C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormAdvance.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormEmployeeInfo.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormEmployees.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormLogin.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormMainMenu.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormSalaryCalculation.resources
-C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormSettings.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.FormUsers.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.Properties.Resources.resources
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\Salary_Cal.csproj.GenerateResource.cache
@@ -111,3 +109,5 @@ C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\bin\Debug\PdfSharp.Quality.xml
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\bin\Debug\PdfSharp.Snippets.pdb
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\bin\Debug\PdfSharp.pdb
 C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\bin\Debug\PdfSharp.xml
+C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\FormAdvance.resources
+C:\Users\osama\source\repos\Salary_Cal\Salary_Cal\obj\Debug\FormSettings.resources

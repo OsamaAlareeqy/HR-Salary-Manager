@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using static Salary_Cal.gridAttendance;
+using Salary_Cal;
 
 namespace Salary_Cal
 {
@@ -16,11 +17,11 @@ namespace Salary_Cal
     {
         private List<AttendanceRecord> allRecords = new List<AttendanceRecord>();
         private double totalSalary = 0;
-        private List<gridAttendance.AttendanceRecord> allAttendanceRecords;
+        private List<AttendanceRecord> allAttendanceRecords;
 
 
 
-        public void LoadAttendanceRecords(List<gridAttendance.AttendanceRecord> records)
+        public void LoadAttendanceRecords(List<AttendanceRecord> records)
         {
             allAttendanceRecords = records;
         }
@@ -102,19 +103,20 @@ namespace Salary_Cal
             using (var conn = new SQLiteConnection("Data Source=employees.db"))
             {
                 conn.Open();
-                var cmd = new SQLiteCommand("SELECT EmployeeID, Timestamp, IsIn FROM Attendance", conn);
+                var cmd = new SQLiteCommand("SELECT EmployeeID, Date, InTime FROM Attendance", conn);
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     allRecords.Add(new AttendanceRecord
                     {
-                        EmployeeId = reader.GetInt32(0),
-                        Timestamp = DateTime.Parse(reader["Timestamp"].ToString()),
-                        IsIn = Convert.ToBoolean(reader["IsIn"])
+                        EmployeeID = reader.GetInt32(0),
+                        Date = DateTime.Parse(reader["Date"].ToString()), 
+                        InTime = reader.GetInt32(reader.GetOrdinal("InTime")) == 1
                     });
                 }
             }
         }
+
 
         private void LoadSummaryToForm()
         {
@@ -170,22 +172,23 @@ namespace Salary_Cal
         {
             var grouped = new List<(DateTime, DateTime?, DateTime?, double)>();
             var days = records
-                .GroupBy(r => r.Timestamp.Date)
+                .GroupBy(r => r.Date.Date)
                 .OrderBy(g => g.Key);
 
             foreach (var day in days)
             {
-                var ins = day.Where(r => r.IsIn).OrderBy(r => r.Timestamp).FirstOrDefault();
-                var outs = day.Where(r => !r.IsIn).OrderByDescending(r => r.Timestamp).FirstOrDefault();
+                var ins = day.Where(r => r.InTime == true).OrderBy(r => r.Date).FirstOrDefault();
+                var outs = day.Where(r => r.InTime == false).OrderByDescending(r => r.Date).FirstOrDefault();
 
-                if (ins != null && outs != null && outs.Timestamp > ins.Timestamp)
+
+                if (ins != null && outs != null && outs.Date > ins.Date)
                 {
-                    double hours = (outs.Timestamp - ins.Timestamp).TotalHours;
-                    grouped.Add((day.Key, ins.Timestamp, outs.Timestamp, Math.Round(hours, 2)));
+                    double hours = (outs.Date - ins.Date).TotalHours;
+                    grouped.Add((day.Key, ins.Date, outs.Date , Math.Round(hours, 2)));
                 }
                 else
                 {
-                    grouped.Add((day.Key, ins?.Timestamp, outs?.Timestamp, 0));
+                    grouped.Add((day.Key, ins?.Date, outs?.Date, 0));
                 }
             }
             return grouped;
@@ -207,12 +210,6 @@ namespace Salary_Cal
             return holidays;
         }
 
-        public class AttendanceRecord
-        {
-            public int EmployeeId { get; set; }
-            public DateTime Timestamp { get; set; }
-            public bool IsIn { get; set; }
-        }
 
         private void btnExportPDF_Click(object sender, EventArgs e)
         {
@@ -225,12 +222,12 @@ namespace Salary_Cal
 
         private List<AttendanceRecord> attendanceRecords = new List<AttendanceRecord>();
 
-        public void LoadAttendanceRecords(List<AttendanceRecord> records)
-        {
-            attendanceRecords = records;
-            MessageBox.Show("Loaded: " + records.Count + " records");
-
-        }
+        //public void LoadAttendanceRecords(List<AttendanceRecord> records)
+        //{
+        //    attendanceRecords = records;
+        //    MessageBox.Show("Loaded: " + records.Count + " records");
+        //
+        //}
     }
 }
 
