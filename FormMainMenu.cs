@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Salary_Cal.gridAttendance;
 
 namespace Salary_Cal
 {
@@ -63,7 +64,9 @@ namespace Salary_Cal
         }
         private void btnSalaryCalc_Click(object sender, EventArgs e)
         {
-            new FormSalaryCalculation().ShowDialog();
+            var summary = new EmployeeWorkSummary(); 
+            var salaryForm = new FormSalaryCalculation(summary);
+            salaryForm.ShowDialog();
         }
 
         private void button1_Click(object sender, EventArgs e)

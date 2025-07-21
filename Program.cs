@@ -17,8 +17,8 @@ namespace Salary_Cal
             DatabaseHelper.InitializeDatabase();
             Application.Run(new FormLogin());
             //Application.Run( new FormAdvance());
-           //Application.Run( new FormSalaryCalculation());
-
+            //Application.Run( new FormSalaryCalculation());
+            //Application.Run(new gridAttendance());
 
         }
     }

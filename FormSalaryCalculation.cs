@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
+using static Salary_Cal.gridAttendance;
 
 namespace Salary_Cal
 {
@@ -15,12 +16,23 @@ namespace Salary_Cal
     {
         private List<AttendanceRecord> allRecords = new List<AttendanceRecord>();
         private double totalSalary = 0;
+        private List<gridAttendance.AttendanceRecord> allAttendanceRecords;
 
-        public FormSalaryCalculation()
+
+
+        public void LoadAttendanceRecords(List<gridAttendance.AttendanceRecord> records)
+        {
+            allAttendanceRecords = records;
+        }
+
+        private EmployeeWorkSummary summary;
+        public FormSalaryCalculation(EmployeeWorkSummary passedSummary)
         {
             InitializeComponent();
+            summary = passedSummary;
             LoadEmployees();
             LoadAttendanceRecords();
+            LoadSummaryToForm();
         }
 
         private void FormSalaryCalculation_Load(object sender, EventArgs e)
@@ -47,137 +59,43 @@ namespace Salary_Cal
             }
             cmbEmployees.DisplayMember = "Name";
         }
+
         private void btnCalculate_Click(object sender, EventArgs e)
         {
-            if (cmbEmployees.SelectedItem == null)
+            if (cmbEmployees.SelectedItem == null || allAttendanceRecords == null)
             {
-                MessageBox.Show("يرجى اختيار موظف");
+                MessageBox.Show("يرجى اختيار موظف وتحميل سجلات الحضور أولاً.");
                 return;
             }
 
-            dynamic selected = cmbEmployees.SelectedItem;
-            int empId = selected.ID;
-            double salary = GetSalary(empId);
-            var empDetails = GetEmployeeDetails(empId);
-            var empRecords = allRecords.Where(r => r.EmployeeId == empId).ToList();
-            var dailyAttendance = GetDailyAttendance(empRecords);
+            dynamic selectedEmp = cmbEmployees.SelectedItem;
+            int empId = selectedEmp.ID;
+            DateTime selectedMonth = dtMonth.Value;
 
-            double totalHours = dailyAttendance.Sum(d => d.Hours);
-            double regularHours = dailyAttendance.Sum(d => d.Hours > 9 ? 9 : d.Hours);
-            double overtimeHours = dailyAttendance.Sum(d => d.Hours > 9 ? d.Hours - 9 : 0);
-            double hourlyRate = salary / (22 * 9);  // 22 يوم دوام، 9 ساعات باليوم
-            double overtimeAmount = overtimeHours * hourlyRate * 1.25;
+            var summary = gridAttendance.GenerateSummaryForEmployee(empId, selectedMonth, allAttendanceRecords);
 
-            double holidayBonus = 0;
-            var holidays = LoadOfficialHolidays();
-            holidayBonus = dailyAttendance
-                .Where(d => holidays.Contains(d.Date.ToString("yyyy-MM-dd")))
-                .Sum(d => d.Hours) * hourlyRate;
+            txtRegularHours.Text = summary.TotalRegularHours.ToString("0.##");
+            txtOvertimeHours.Text = summary.TotalOvertimeHours.ToString("0.##");
+            txtHolidayHours.Text = summary.TotalHolidayOvertimeHours.ToString("0.##");
 
-            double totalEarnings = salary + overtimeAmount + holidayBonus;
-            double totalDeductions = DatabaseHelper.GetEmployeeTotalAdvances(empId);
-            double net = totalEarnings - totalDeductions;
-
-            totalSalary = net;
-
-            MessageBox.Show($"الراتب الصافي: {net:0.##} دينار");
-        }
-        private void txtResult_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnExportPDF_Click(object sender, EventArgs e)
-        {
-            if (cmbEmployees.SelectedItem == null)
+            if (double.TryParse(txtMonthlySalary.Text, out double monthlySalary))
             {
-                MessageBox.Show("يرجى اختيار موظف");
-                return;
+                double hourlyRate = monthlySalary / 30 / 9;
+
+                double totalPay =
+                    summary.TotalRegularHours * hourlyRate +
+                    summary.TotalOvertimeHours * hourlyRate * 1.25 +
+                    summary.TotalHolidayOvertimeHours * hourlyRate * 1.5;
+
+                txtCalculatedSalary.Text = totalPay.ToString("0.##");
+                txtResult.Text = totalPay.ToString("0.##");
             }
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "PDF Files|*.pdf";
-            saveFileDialog.FileName = "كشف_الراتب.pdf";
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            else
             {
-                Bitmap bmp = new Bitmap(1200, 1800);
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.Clear(Color.White);
-
-                    var emp = (dynamic)cmbEmployees.SelectedItem;
-                    int empId = emp.ID;
-                    double salary = GetSalary(empId);
-                    var empDetails = GetEmployeeDetails(empId);
-                    var empRecords = allRecords.Where(r => r.EmployeeId == empId).ToList();
-                    var dailyAttendance = GetDailyAttendance(empRecords);
-
-                    var fontTitle = new Font("Segoe UI", 18, FontStyle.Bold);
-                    var font14 = new Font("Segoe UI", 14);
-                    var font16b = new Font("Segoe UI", 16, FontStyle.Bold);
-
-                    float y = 40;
-
-                    // عنوان الشركة
-                    g.DrawString("اسم الشركة", fontTitle, Brushes.Black, 450, y);
-                    g.DrawString($"قسائم رواتب الموظفين عن شهر {DateTime.Now:MM} لعام {DateTime.Now:yyyy}", font14, Brushes.Black, 350, y += 50);
-
-                    // بيانات الموظف
-                    g.DrawString($" {emp.Name} : الاسم  \t\t\t\t\t\t\t\t\t\t\t      الرقم الوظيفي : {empId}", font14, Brushes.Black, 50, y += 60);
-                    g.DrawString($" {empDetails.Title} : المسمى الوظيفي", font14, Brushes.Black, 50, y += 40);
-                    g.DrawString($"الراتب الأساسي: {salary:0.##} \t\t\t الرقم الوطني: {empDetails.NationalID} \t\t\t   تاريخ التعيين: {empDetails.HireDate}", font14, Brushes.Black, 50, y += 40);
-
-
-                    y += 60;
-                    // جداول العلاوات والاقتطاعات
-                    g.DrawString("علاوات الموظف", font16b, Brushes.Black, 100, y += 80);
-                    y += 20;
-                    g.DrawString("النوع", font14, Brushes.Black, 300, y += 30);
-                    g.DrawString("القيمة", font14, Brushes.Black, 100, y);
-                    g.DrawString("عمل إضافي", font14, Brushes.Black, 300, y += 30);
-                    g.DrawString((dailyAttendance.Sum(d => d.Hours > 9 ? d.Hours - 9 : 0) * (salary / (22 * 9)) * 1.25).ToString("0.##"), font14, Brushes.Black, 100, y);
-                    g.DrawString("بدل عطل رسمية", font14, Brushes.Black, 300, y += 30);
-                    g.DrawString("...", font14, Brushes.Black, 100, y); // قيمة البدل
-
-
-                    g.DrawString("اقتطاعات الموظف", font16b, Brushes.Black, 900, y - 90);
-                    y += 20;
-                    g.DrawString("النوع", font14, Brushes.Black, 900, y - 60);
-                    g.DrawString("القيمة", font14, Brushes.Black, 700, y - 60);
-                    g.DrawString("الخصومات", font14, Brushes.Black, 900, y - 30);
-                    g.DrawString("0", font14, Brushes.Black, 700, y - 30);  // خصومات إضافية
-                    g.DrawString("مجموع السلف", font14, Brushes.Black, 900, y);
-                    g.DrawString(DatabaseHelper.GetEmployeeTotalAdvances(empId).ToString("0.##"), font14, Brushes.Black, 700, y);
-
-                    // الراتب الصافي
-                    y += 100;
-                    g.DrawString($"\t\t\t\t\tصافي الراتب: {totalSalary:0.##} دينار", font16b, Brushes.Black, 50, y);
-
-                    // جدول الحضور
-                    y += 80;
-                    DrawAttendanceTable(g, dailyAttendance, font14, font16b, ref y);
-
-                    // التوقيع
-                    g.DrawString($"\t\t\t أنا الموقع أدناه أقر بأن التفاصيل الذكورة اعلاه صحيحة واني استلمت المبلغ الذكور كاملاً   ", font14, Brushes.Black, 50, y += 40);
-                    y += 50;
-                    g.DrawString($"\t\t\t\t\t  ___________ :  التاريخ: {DateTime.Now:yyyy-MM-dd}             التوقيع                   ", font14, Brushes.Black, 50, y += 40);
-                }
-
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    bmp.Save(ms, ImageFormat.Png);
-                    PdfDocument pdf = new PdfDocument();
-                    PdfPage page = pdf.AddPage();
-                    XGraphics gfx = XGraphics.FromPdfPage(page);
-                    XImage img = XImage.FromStream(new MemoryStream(ms.ToArray()));
-                    gfx.DrawImage(img, 0, 0, page.Width, page.Height);
-                    pdf.Save(saveFileDialog.FileName);
-                }
-
-                MessageBox.Show("تم تصدير الكشف بنجاح!");
+                MessageBox.Show("الرجاء إدخال راتب شهري صحيح.");
             }
         }
+
 
         private void LoadAttendanceRecords()
         {
@@ -195,6 +113,25 @@ namespace Salary_Cal
                         IsIn = Convert.ToBoolean(reader["IsIn"])
                     });
                 }
+            }
+        }
+
+        private void LoadSummaryToForm()
+        {
+            txtRegularHours.Text = summary.TotalRegularHours.ToString("0.##");
+            txtOvertimeHours.Text = summary.TotalOvertimeHours.ToString("0.##");
+            txtHolidayHours.Text = summary.TotalHolidayOvertimeHours.ToString("0.##");
+
+            if (double.TryParse(txtMonthlySalary.Text, out double salary))
+            {
+                double hourlyRate = salary / 30 / 9;
+
+                double totalPay =
+                    hourlyRate * summary.TotalRegularHours +
+                    hourlyRate * 1.25 * summary.TotalOvertimeHours +
+                    hourlyRate * 1.5 * summary.TotalHolidayOvertimeHours;
+
+                txtCalculatedSalary.Text = totalPay.ToString("0.##");
             }
         }
 
@@ -270,56 +207,30 @@ namespace Salary_Cal
             return holidays;
         }
 
-        private void DrawAttendanceTable(Graphics g, List<(DateTime Date, DateTime? In, DateTime? Out, double Hours)> dailyAttendance, Font f14, Font f16b, ref float y)
+        public class AttendanceRecord
         {
-            g.DrawString("سجل حضور الموظف", f16b, Brushes.Black, 50, y);
-            y += 40;
+            public int EmployeeId { get; set; }
+            public DateTime Timestamp { get; set; }
+            public bool IsIn { get; set; }
+        }
 
-            float colW = 130, rowH = 30;
-            float x1 = 50, x2 = 650;
+        private void btnExportPDF_Click(object sender, EventArgs e)
+        {
 
-            void DrawHeader(float startX, float startY)
-            {
-                g.DrawRectangle(Pens.Black, startX, startY, colW, rowH);
-                g.DrawRectangle(Pens.Black, startX + colW, startY, colW, rowH);
-                g.DrawRectangle(Pens.Black, startX + 2 * colW, startY, colW, rowH);
-                g.DrawRectangle(Pens.Black, startX + 3 * colW, startY, colW, rowH);
-                g.DrawString("التاريخ", f14, Brushes.Black, startX + 10, startY + 5);
-                g.DrawString("دخول", f14, Brushes.Black, startX + colW + 10, startY + 5);
-                g.DrawString("خروج", f14, Brushes.Black, startX + 2 * colW + 10, startY + 5);
-                g.DrawString("عدد الساعات", f14, Brushes.Black, startX + 3 * colW + 10, startY + 5);
-            }
+        }
+        public List<AttendanceRecord> GetAttendanceRecords()
+        {
+            return allRecords;
+        }
 
-            int half = (int)Math.Ceiling(dailyAttendance.Count / 2.0);
-            DrawHeader(x1, y);
-            DrawHeader(x2, y);
-            y += rowH;
+        private List<AttendanceRecord> attendanceRecords = new List<AttendanceRecord>();
 
-            for (int i = 0; i < dailyAttendance.Count; i++)
-            {
-                var d = dailyAttendance[i];
-                float colX = (i < half) ? x1 : x2;
-                float rowY = (i < half) ? y + i * rowH : y + (i - half) * rowH;
+        public void LoadAttendanceRecords(List<AttendanceRecord> records)
+        {
+            attendanceRecords = records;
+            MessageBox.Show("Loaded: " + records.Count + " records");
 
-                g.DrawRectangle(Pens.Black, colX, rowY, colW, rowH);
-                g.DrawRectangle(Pens.Black, colX + colW, rowY, colW, rowH);
-                g.DrawRectangle(Pens.Black, colX + 2 * colW, rowY, colW, rowH);
-                g.DrawRectangle(Pens.Black, colX + 3 * colW, rowY, colW, rowH);
-
-                g.DrawString(d.Date.ToString("yyyy-MM-dd"), f14, Brushes.Black, colX + 5, rowY + 5);
-                g.DrawString(d.In?.ToString("HH:mm") ?? "-", f14, Brushes.Black, colX + colW + 5, rowY + 5);
-                g.DrawString(d.Out?.ToString("HH:mm") ?? "-", f14, Brushes.Black, colX + 2 * colW + 5, rowY + 5);
-                g.DrawString(d.Hours.ToString("0.##"), f14, Brushes.Black, colX + 3 * colW + 5, rowY + 5);
-            }
-
-            y += (half * rowH) + 20;
         }
     }
-
-    public class AttendanceRecord
-    {
-        public int EmployeeId { get; set; }
-        public DateTime Timestamp { get; set; }
-        public bool IsIn { get; set; }
-    }
 }
+

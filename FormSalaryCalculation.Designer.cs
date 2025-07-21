@@ -5,15 +5,8 @@ namespace Salary_Cal
 {
     partial class FormSalaryCalculation
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -25,11 +18,6 @@ namespace Salary_Cal
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        
         private void InitializeComponent()
         {
             this.cmbEmployees = new System.Windows.Forms.ComboBox();
@@ -41,6 +29,11 @@ namespace Salary_Cal
             this.lblEmployee = new System.Windows.Forms.Label();
             this.lblMonth = new System.Windows.Forms.Label();
             this.lblResult = new System.Windows.Forms.Label();
+            this.txtRegularHours = new System.Windows.Forms.TextBox();
+            this.txtOvertimeHours = new System.Windows.Forms.TextBox();
+            this.txtHolidayHours = new System.Windows.Forms.TextBox();
+            this.txtMonthlySalary = new System.Windows.Forms.TextBox();
+            this.txtCalculatedSalary = new System.Windows.Forms.TextBox();
             this.groupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -77,12 +70,11 @@ namespace Salary_Cal
             this.txtResult.ReadOnly = true;
             this.txtResult.Size = new System.Drawing.Size(120, 30);
             this.txtResult.TabIndex = 6;
-            this.txtResult.TextChanged += new System.EventHandler(this.txtResult_TextChanged);
             // 
             // btnExportPDF
             // 
             this.btnExportPDF.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.btnExportPDF.Location = new System.Drawing.Point(230, 240);
+            this.btnExportPDF.Location = new System.Drawing.Point(207, 260);
             this.btnExportPDF.Name = "btnExportPDF";
             this.btnExportPDF.Size = new System.Drawing.Size(140, 32);
             this.btnExportPDF.TabIndex = 1;
@@ -136,11 +128,55 @@ namespace Salary_Cal
             this.lblResult.TabIndex = 5;
             this.lblResult.Text = " : الراتب النهائي";
             // 
+            // txtRegularHours
+            // 
+            this.txtRegularHours.Location = new System.Drawing.Point(436, 226);
+            this.txtRegularHours.Name = "txtRegularHours";
+            this.txtRegularHours.ReadOnly = true;
+            this.txtRegularHours.Size = new System.Drawing.Size(120, 30);
+            this.txtRegularHours.TabIndex = 7;
+            // 
+            // txtOvertimeHours
+            // 
+            this.txtOvertimeHours.Location = new System.Drawing.Point(436, 262);
+            this.txtOvertimeHours.Name = "txtOvertimeHours";
+            this.txtOvertimeHours.ReadOnly = true;
+            this.txtOvertimeHours.Size = new System.Drawing.Size(120, 30);
+            this.txtOvertimeHours.TabIndex = 8;
+            // 
+            // txtHolidayHours
+            // 
+            this.txtHolidayHours.Location = new System.Drawing.Point(436, 302);
+            this.txtHolidayHours.Name = "txtHolidayHours";
+            this.txtHolidayHours.ReadOnly = true;
+            this.txtHolidayHours.Size = new System.Drawing.Size(120, 30);
+            this.txtHolidayHours.TabIndex = 9;
+            // 
+            // txtMonthlySalary
+            // 
+            this.txtMonthlySalary.Location = new System.Drawing.Point(436, 342);
+            this.txtMonthlySalary.Name = "txtMonthlySalary";
+            this.txtMonthlySalary.Size = new System.Drawing.Size(120, 30);
+            this.txtMonthlySalary.TabIndex = 10;
+            // 
+            // txtCalculatedSalary
+            // 
+            this.txtCalculatedSalary.Location = new System.Drawing.Point(436, 382);
+            this.txtCalculatedSalary.Name = "txtCalculatedSalary";
+            this.txtCalculatedSalary.ReadOnly = true;
+            this.txtCalculatedSalary.Size = new System.Drawing.Size(120, 30);
+            this.txtCalculatedSalary.TabIndex = 11;
+            // 
             // FormSalaryCalculation
             // 
-            this.ClientSize = new System.Drawing.Size(600, 350);
+            this.ClientSize = new System.Drawing.Size(600, 450);
             this.Controls.Add(this.groupBox);
             this.Controls.Add(this.btnExportPDF);
+            this.Controls.Add(this.txtRegularHours);
+            this.Controls.Add(this.txtOvertimeHours);
+            this.Controls.Add(this.txtHolidayHours);
+            this.Controls.Add(this.txtMonthlySalary);
+            this.Controls.Add(this.txtCalculatedSalary);
             this.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -151,9 +187,9 @@ namespace Salary_Cal
             this.groupBox.ResumeLayout(false);
             this.groupBox.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
-
 
         #endregion
 
@@ -166,5 +202,10 @@ namespace Salary_Cal
         private System.Windows.Forms.Label lblResult;
         private System.Windows.Forms.Label lblEmployee;
         private System.Windows.Forms.Label lblMonth;
+        private System.Windows.Forms.TextBox txtRegularHours;
+        private System.Windows.Forms.TextBox txtOvertimeHours;
+        private System.Windows.Forms.TextBox txtHolidayHours;
+        private System.Windows.Forms.TextBox txtMonthlySalary;
+        private System.Windows.Forms.TextBox txtCalculatedSalary;
     }
 }
